@@ -162,6 +162,8 @@ export default {
             this.sendLineNotify("แจ้งเตือน: อุณหภูมิต่ำเกินไป! อุณหภูมิขณะนี้คือ " + newTemp + " °C");
             const payload = JSON.stringify({ "Light3": "1" });
             this.client.publish("phanu/Light3", payload);
+            const payload2 = JSON.stringify({ "Light2": "0" });
+            this.client.publish("phanu/Light2", payload2);
           }
         } else {
           newStatus1 = "ปกติ";
@@ -187,6 +189,8 @@ export default {
             this.sendLineNotify("แจ้งเตือน: อุณหภูมิต่ำเกินไป! อุณหภูมิขณะนี้คือ " + newTemp + " °C");
             const payload = JSON.stringify({ "Light3": "1" });
             this.client.publish("phanu/Light3", payload);
+            const payload2 = JSON.stringify({ "Light2": "0" });
+            this.client.publish("phanu/Light2", payload2);
           }
         } else {
           newStatus1 = "ปกติ";
@@ -212,6 +216,8 @@ export default {
             this.sendLineNotify("แจ้งเตือน: อุณหภูมิต่ำเกินไป! อุณหภูมิขณะนี้คือ " + newTemp + " °C");
             const payload = JSON.stringify({ "Light3": "1" });
             this.client.publish("phanu/Light3", payload);
+            const payload2 = JSON.stringify({ "Light2": "0" });
+            this.client.publish("phanu/Light2", payload2);
           }
         } else {
           newStatus1 = "ปกติ";
@@ -237,6 +243,8 @@ export default {
             this.sendLineNotify("แจ้งเตือน: อุณหภูมิต่ำเกินไป! อุณหภูมิขณะนี้คือ " + newTemp + " °C");
             const payload = JSON.stringify({ "Light3": "1" });
             this.client.publish("phanu/Light3", payload);
+            const payload2 = JSON.stringify({ "Light2": "0" });
+            this.client.publish("phanu/Light2", payload2);
           }
         } else {
           newStatus1 = "ปกติ";
@@ -262,6 +270,8 @@ export default {
             this.sendLineNotify("แจ้งเตือน: อุณหภูมิต่ำเกินไป! อุณหภูมิขณะนี้คือ " + newTemp + " °C");
             const payload = JSON.stringify({ "Light3": "1" });
             this.client.publish("phanu/Light3", payload);
+            const payload2 = JSON.stringify({ "Light2": "0" });
+            this.client.publish("phanu/Light2", payload2);
           }
         } else {
           newStatus1 = "ปกติ";
@@ -364,9 +374,6 @@ export default {
   },
 
   computed: {
-    showTemptofixed() {
-      return this.showTemp.toFixed(2);
-    },
 
     goodTemp() {
       if (this.state === 1) {
@@ -508,7 +515,7 @@ export default {
       this.client.subscribe("init_revert")
       const payload = JSON.stringify(1);
       this.client.publish("init_revert", payload);
-
+      this.status = "Connected";
     },
     
     disconnectMqtt() {
@@ -558,15 +565,17 @@ export default {
           this.colorLight1 = "#51EE5B";
           this.iconLight1 = "mdi-lightbulb-on-outline";
           this.client.subscribe("ctc/temp");
-          this.client.subscribe("phanu/Light2")
-          this.client.subscribe("phanu/Light3")
-        } 
+          this.client.subscribe("phanu/Light2");
+          this.client.subscribe("phanu/Light3");
+          this.client.subscribe("node/datatotal");
+        }
         else if (payload === 0) {
           this.colorLight1 = "#8F8F8F";
           this.iconLight1 = "mdi-lightbulb-off-outline";
           this.client.unsubscribe("ctc/temp");
-          this.client.unsubscribe("phanu/Light2")
-          this.client.unsubscribe("phanu/Light3")
+          this.client.unsubscribe("phanu/Light2");
+          this.client.unsubscribe("phanu/Light3");
+          this.client.unsubscribe("node/datatotal");
           this.status = "OFFLINE";
           this.mqtt = "#8F8F8F";
           this.icon = "mdi-close-circle-outline";
@@ -614,6 +623,16 @@ export default {
           this.showTemp = parseFloat(payload.temp).toFixed(2);
           this.showHumi = parseFloat(payload.humi).toFixed(2);
           this.state = parseFloat(payload.state);
+        } catch (error) {
+          console.error("Failed to parse JSON message:", error);
+        }
+      }
+
+      if (topic === "node/datatotal") {
+        try {
+          const payload = JSON.parse(message.toString());
+          this.showTemp = parseFloat(payload.temp).toFixed(2);
+          this.showHumi = parseFloat(payload.humi).toFixed(2);
         } catch (error) {
           console.error("Failed to parse JSON message:", error);
         }
